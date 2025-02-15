@@ -122,3 +122,34 @@ impl num_traits::Num for IBig {
         Self::from_str_radix(s, radix)
     }
 }
+
+impl num_traits::WrappingAdd for UBig {
+    fn wrapping_add(&self, other: &Self) -> Self {
+        // This is allocating crate, wrapping is same as regular add
+        self + other
+    }
+}
+
+impl num_traits::WrappingSub for UBig {
+    fn wrapping_sub(&self, other: &Self) -> Self {
+        // This is allocating crate, wrapping is same as regular sub
+        // except when other is larger than self, then we'd wrap on zero
+        assert!(other <= self, "wrapping_sub: would wrap to infinity");
+        self - other
+    }
+}
+
+impl num_traits::ops::overflowing::OverflowingAdd for UBig {
+    fn overflowing_add(&self, other: &Self) -> (Self, bool) {
+        // same as wrapping, never overflows
+        (self + other, false)
+    }
+}
+
+impl num_traits::ops::overflowing::OverflowingSub for UBig {
+    fn overflowing_sub(&self, other: &Self) -> (Self, bool) {
+        // same as wrapping, never overflows
+        assert!(other <= self, "wrapping_sub: would wrap to infinity");
+        (self - other , false)
+    }
+}
